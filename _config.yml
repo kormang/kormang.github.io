@@ -20,10 +20,11 @@
 
 title: Kormang's thoughts
 email: kormang@hotmail.rs
+domain: kormang.github.io
 description: >- # this means to ignore newlines until "baseurl:"
     I read somewhere that writing destills thoughts, I certainly feel so.
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "" # the base hostname & protocol for your site, e.g. http://example.com
+url: "https://kormang.github.io"  # the base hostname & protocol for your site, e.g. http://example.com
 # twitter_username: jekyllrb
 github_username:  kormang
 
