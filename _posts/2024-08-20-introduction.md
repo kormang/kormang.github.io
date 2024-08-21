@@ -35,7 +35,7 @@ First task:
 
 You have following code:
 
-```TypeScript
+```typescript
 type Result = {
   odd: number[],
   even: number[],
@@ -52,7 +52,7 @@ If some other language is more familiar to you, then write analogous function in
 
 In Python, for example it would look like this:
 
-```Python
+```python
 @dataclass
 Result:
   odd: int[]
@@ -64,7 +64,7 @@ def separate(values: int[]) -> Result:
 
 In C++:
 
-```C++
+```c++
 struct Result {
   std::vector<int> odd;
   std::vector<int> even;
@@ -77,7 +77,7 @@ Result separate(const std::vector<int>& values) {
 
 Second task:
 
-```TypeScript
+```typescript
 function mostFrequent(values: number[]): number {
 
 }
@@ -85,12 +85,12 @@ function mostFrequent(values: number[]): number {
 
 Implement function `mostFrequent`, without changing function declaration or any code outside the function. Function should return the number that is repeated the most in the input array `values`.
 
-```Python
+```python
 def most_frequent(values: int[]) -> int:
   ...
 ```
 
-```C++
+```c++
 int most_frequent(const std::vector<int>& values) {
 
 }
@@ -120,7 +120,7 @@ In the early days of programming, using `goto` statements was a common thing. It
 
 Consider this program that finds the first even number greater than 10 from a list.
 
-```JavaScript
+```javascript
 const numbers = [3, 7, 12, 5, 18, 9, 20, 15];
 
 for (let i = 0; i < numbers.length; i++) {
@@ -139,7 +139,7 @@ for (let i = 0; i < numbers.length; i++) {
 
 Now consider same algorithm written in early version of BASIC programming language, that did not have loops and instead relied on `goto` statement to jump to specific line labeled with numbers. (That was just a illustration, you don't have to understand it.)
 
-```BASIC
+```basic
 10 REM Initialize variables
 20 LET X = 1
 30 LET LIMIT = 8
@@ -169,7 +169,7 @@ From the beginning, `goto` statements found their way even to `C`. In C language
 
 Here is example of the same algorithm written in C, but without using loops, instead labels and goto statements are used.
 
-```C
+```c
 #include <stdio.h>
 
 int main() {
@@ -203,7 +203,7 @@ loop_end:
 Here is the "normal" C version of the same program.
 Here, we've also added 5 more conditions, so the number has to satisfy 7 conditions in total.
 
-```C
+```c
 #include <stdio.h>
 
 int main() {
@@ -253,7 +253,7 @@ If you feel like this is getting too complicated, it is because it is, but we ha
 
 We might be lazy, and the first thing that comes to our mind might be to reuse all those if statements with a quick trick:
 
-```C
+```c
 #include <stdio.h>
 
 int main() {
@@ -302,7 +302,7 @@ check:
 
 Now we have a bug there. If the new `num` satisfies the conditions, we will divide it by 2 and try again, which is not what our specification requires. So, to address this, we don't want to think about refactoring. When we're already here, we might just as well add a little `if` statement before `i = length;` to prevent it.
 
-```C
+```c
 #include <stdio.h>
 
 int main() {
@@ -380,7 +380,7 @@ Consider this case: we have a function, and for some reason, we either don't wan
 
 The opposite example would be having a few simple lines like this:
 
-```TypeScript
+```typescript
   if (someVar <= 3) {
     result = processData(someVar, data)
     saveResult(result)
@@ -391,7 +391,7 @@ We might have code like this in only three places, and it seems really simple. W
 
 However, after a few months, we need to change it because the declaration and behavior of the function `processData` have changed; we need to call two different functions `processData2` and `processData3` depending on some conditions. The first place where we wrote that code after these changes looks like this (and there were no other changes to the code in that first place in the meantime):
 
-```TypeScript
+```typescript
   if (someVar <= 2) {
     {result} = processData2(someVar, data)
     saveResult2(result.data)
@@ -405,7 +405,7 @@ Seems simple enough. Now we need to do it in two more places. The change is not 
 
 Imagine that the code in the second location changed in the meantime, and now it looks like this:
 
-```TypeScript
+```typescript
   if (someVar <= 3 && eligibleToProcess) {
     result = processData(someVar, data)
   } else {
@@ -466,7 +466,7 @@ We find bot config by username. using function `getBotConfig`. That function can
 
 Imagine that existing code that runs chat session looks like this.
 
-```TypeScript
+```typescript
 function getBot(username: string): ChatBot {
   const botConfig = await getBotConfig(username)
 
@@ -492,7 +492,7 @@ After some time it is decided that we want to enable configuration of custom bot
 We might modify code the following way.
 
 
-```TypeScript
+```typescript
 const SWITCH_MSG = "Thank you for answering all the questions. You can now continue conversation with the bot you have just configured"
 
 function getBot(botConfig?: BotConfig): ChatBot {
@@ -530,7 +530,7 @@ Now, imagine that we have new features to implement. For user named `admin` we n
 
 This could be the code that we write in similar fashion as the one before.
 
-```TypeScript
+```typescript
 
 function getBot(botConfig?: BotConfig, username: string): ChatBot {
   if (username === 'admin') {
@@ -567,7 +567,7 @@ function runBot(username: string) {
 Now, imagine that for `guest` user we instantiate simply `GuestBot` which does not have config.
 
 
-```TypeScript
+```typescript
 
 function getBot(botConfig?: BotConfig, username: string): ChatBot {
   if (username === 'admin') {
@@ -611,7 +611,7 @@ function runBot(username: string) {
 Now, we decide that admin can also configure its `AdminHelperBot` through `InitialAdminBot`, and that `InitialAdminBot` can have `BotConfig`. After admin has configured its helper bot, it will continue conversation with its helper bot immediately.
 
 
-```TypeScript
+```typescript
 
 function getBot(botConfig?: BotConfig, username: string): ChatBot {
   if (username === 'admin') {
@@ -667,7 +667,7 @@ Important thing to note is that all other logic, except from `runBot` and `getBo
 
 Let's name it `CombinedBot`, the bot that first configures custom bot using `ConfigurationBot` and then switch the conversation to newly configured `CustomBot`.
 
-```TypeScript
+```typescript
 class CombinedBot {
   constructor(private readonly username: string) {
     this._config_bot = new ConfigurationBot();
@@ -697,7 +697,7 @@ This way, we have composed third bot from the other two. We could do the same wi
 
 Let's see how could our code look like now.
 
-```TypeScript
+```typescript
 
 function getBot(botConfig?: BotConfig, username: string): ChatBot {
   if (username === 'admin') {

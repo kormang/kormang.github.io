@@ -33,12 +33,6 @@ plugins:
   - jekyll-feed
 
 
-lsi: false
-# safe: true
-# incremental: false
-gist:
-  noscript: false
-
 # Conversion
 markdown:    kramdown
 highlighter: rouge
