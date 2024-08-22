@@ -22,12 +22,13 @@ title: Kormang's thoughts
 email: kormang@hotmail.rs
 domain: kormang.github.io
 description: >- # this means to ignore newlines until "baseurl:"
-    I read somewhere that writing destills thoughts, I certainly feel so.
+  I read somewhere that writing destills thoughts, I certainly feel so.
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "https://kormang.github.io"  # the base hostname & protocol for your site, e.g. http://example.com
+url: "https://kormang.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 # twitter_username: jekyllrb
 github_username: kormang
-linkedin_username: marko-ivanovic-8648b3135
+linkedin_username: marko-ivanovic-8648b3135/Marko Ivanovic
+stackoverflow_username: 1873877/marko
 google_analytics: G-QLY934WD2Z
 
 # Build settings
@@ -35,9 +36,8 @@ theme: minima
 plugins:
   - jekyll-feed
 
-
 # Conversion
-markdown:    kramdown
+markdown: kramdown
 highlighter: rouge
 
 # Markdown Processors
@@ -46,8 +46,6 @@ kramdown:
   auto_ids: true
   syntax_highlighter: rouge
   math_engine: mathjax
-
-
 # Exclude from processing.
 # The following items will not be processed, by default.
 # Any item listed under the `exclude:` key here will be automatically added to
