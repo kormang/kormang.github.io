@@ -1,3 +1,8 @@
+---
+layout: post
+author: kormang
+---
+
 At first we make perfectly readable and beautiful code, but somehow it turns into spaghetti, or even worst, just a pile of garbage. How do we let that happen? Let's try to illustrate it with few examples.
 
 One of the advantages of de-duplicated code is the ability to make changes in only one place.However, that is not always true, nor is it always cheaper to make changes in only one place or a few places rather than many places.
