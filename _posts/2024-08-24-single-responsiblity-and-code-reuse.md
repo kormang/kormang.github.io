@@ -1,3 +1,7 @@
+---
+layout: post
+author: kormang
+---
 
 _"The more we build things by small pieces, the more the same underlying resources can be reused, making the whole system simpler to use."_ - "FreeSWITCH" 1.8 by Anthony Minessale II and Giovanni Maruzzelli.
 
@@ -17,7 +21,7 @@ _(If you're not familiar with the C programming language, try your best to under
 
 Think about this C language function that finds the most repeated number in a sequence:
 
-```C
+```c
 int most_frequent(int numbers[], int length) {
   ...
 }
@@ -32,7 +36,7 @@ As those who know C can confirm, on one end of the spectrum is allocating data s
 
 Let's look at the full example.
 
-```C
+```c
 struct bucket {
   int key;
   int value;
@@ -118,7 +122,7 @@ We can extract following functions for hash table:
 Following block of code contains details of implementation for those functions, and can be skipped.
 The block of code after this one, will demonstrate how simple implementation of `most_frequent` can be.
 
-```C
+```c
 struct bucket {
   int key;
   int value;
@@ -250,7 +254,7 @@ void hash_table_free(struct hash_table* hash_table) {
 
 Now implementation of `most_frequent` is super simple and readable. At the same time, we have couple of functions and a reusable data structure that we can use in many other places.
 
-```C
+```c
 int most_frequent(int numbers[], int length) {
   struct hash_table* hash_table = hash_table_init(257);
 
