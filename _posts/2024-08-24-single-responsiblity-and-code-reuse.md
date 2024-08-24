@@ -327,3 +327,7 @@ function mostFrequent(numbers: number[]): number {
 ```
 
 Here, the garbage collector takes care of the helper data structure, and its constructor and methods manage its state. So now the code is absolutely clean — free from all other responsibilities, other than the algorithm itself. Hash table, represented by class `Map` here, is already built-in reusable component, that we often take for granted.
+
+
+
+In the next article we will look at bunch of examples (in JavaScript, TypeScript and Java) to better explain the concept.
