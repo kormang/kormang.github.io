@@ -3,11 +3,11 @@ layout: post
 author: kormang
 ---
 
-As explained in the previous post, generalized code can come in different shapes. It can be abstract classes that need to be inherited from, it can be function that accepts another function as parameter, it can be generic functions that accept generic parameters (template arguments).
+As explained in the previous post, generalized code can take various forms. It can be abstract classes that require inheritance, functions that accept other functions as parameters, or generic functions that utilize generic parameters (template arguments).
 
-However, there are no fundamental differences between them as significant as between approaches we are about to see next.
+However, there are no fundamental differences between these forms as significant as those between the approaches we are about to explore.
 
-This is about classification of approaches to making one unit of code do different things depending on some context. There are two basic approaches to making code generalized. Let's take a look at trivial example to illustrate these two approaches.
+This discussion focuses on the classification of approaches to enabling one unit of code to perform different tasks depending on the context. There are two basic approaches to making code generalized. Let’s look at a trivial example to illustrate these two approaches.
 
 We have function `performOperation(a: number, b: number, c: number, d: number, operation: string): number`, which performs binary operation on 4 numbers, and the type of operation depends on the string parameter (if "+" then it will perform addition `(a + b) + (c + d)`, if "-" subtraction `(a - b) - (c - d)`, and so on).
 
@@ -86,13 +86,13 @@ console.log(performOperation(1, 2, 3, 4, (a, b) => a % b));
 
 ```
 
-Hybrid approach may be the best option sometimes, if we really often use standard operators and if it turns out to be really good developer experience to use parameters like in the first approach. Otherwise, second approach is objectively the best as it is simple yet as flexible, reusable, and generalized as it can get.
+The hybrid approach may be the best option in some cases, especially if we frequently use standard operators and find it significantly improves the developer experience to use parameters like in the first approach. Otherwise, the second approach is objectively the best, as it is simple yet as flexible, reusable, and generalized as possible.
 
-First approach (parameterizing with *behavior modifying data*, rather then behavior itself) is usually the worst approach, but it some rare cases it can be justified.
+The first approach (parameterizing with *behavior-modifying data* rather than behavior itself) is usually the least favorable, but in rare cases, it can be justified.
 
-Some might find hybrid approach to be the best, if you prefer simplicity of passing common operations as string/enum. Some might find the second approach to be better then hybrid, if we would have a library of named operation objects (lambdas), we wouldn't need to switch on operation type and an IDE would likely tell us what predefined operation objects are available.
+Some may find the hybrid approach to be the best if they prefer the simplicity of passing common operations as strings or enums. Others might prefer the second approach, especially if we have a library of named operation objects (lambdas), as this eliminates the need to switch on operation types, and an IDE would likely provide suggestions for available predefined operation objects.
 
-Even more common example of the first approach is adding flags to modify behavior, that is, passing boolean parameter.
+An even more common example of the first approach is adding flags to modify behavior, such as passing a boolean parameter.
 
 ```typescript
 async function updateProducts(seller: Seller) {
@@ -104,7 +104,7 @@ async function updateProducts(seller: Seller) {
 }
 ```
 
-Imagine that we want to make the `updateProducts` function more generalized. Sometimes, we might want to assign a seller object to a product object, but not always. Therefore, we want to reuse the function while adding this additional functionality.
+Imagine that we want to make the `updateProducts` function more generalized. Sometimes, we might want to assign a seller object to a product object, but not always (assume that we receive product object from backend without seller object as their attribute). Therefore, we want to reuse the function while adding this additional functionality.
 
 ```typescript
 async function updateProducts(seller: Seller, assignSeller: boolean) {
@@ -148,6 +148,7 @@ await updateProducts(seller, products => products);
 // Version that assigns seller.
 await updateProducts(seller, products => {
   products.forEach(p => p.seller = seller);
+  return products;
 });
 
 // Version that does something else.
@@ -195,13 +196,15 @@ async function updateProductsWithSomething(seller: Seller) {
 }
 ```
 
-*Notice the subtle difference in the way products are fetched in these two examples. It can matter a lot when it comes to making code maintainable. Split the responsibilities when ever possible. Build large super-function that do a lot, only if they are built from small pieces, that can be used outside of the super-function too.*
+*Notice the subtle difference in the way products are fetched in these two examples—it can make a big difference when it comes to maintainability. Always aim to split responsibilities whenever possible. Build large, multifunctional "super-functions" only if they are composed of smaller, well-defined pieces that can be reused independently outside of the super-function.*
 
-Both the second and third approaches are valid and should be chosen based on the situation. The third approach (avoiding generalization altogether) may not be very useful in our first example (with `performOperation`), but in the second example (with products), it's likely even better. Everything depends on the circumstances, so we should carefully consider before deciding.
+Both the second and third approaches are valid and should be chosen based on the situation. The third approach (avoiding generalization altogether) may not be very useful in our first example (with `performOperation`), but in the second example (with products), it might actually be better. The choice depends on the circumstances, so we should carefully consider the context before deciding.
 
-It's important to note that the third approach isn't really about generalization. It's more about avoiding it. As we've seen, this is often preferred because, as mentioned, generalized code can become more complex. However, there are times when generalization is beneficial. We can say there are two approaches to generalization: one involves using flags and other parameters that change behavior, and the other involves parameterizing generalized code with specific behaviors.
+It's important to note that the third approach isn't about generalization—it's about avoiding it. This is often preferred because, as mentioned, generalized code can become more complex. However, there are times when generalization is beneficial. We can categorize two approaches to generalization:
+1. Using flags and other parameters to modify behavior.
+2. Parameterizing generalized code with specific behaviors.
 
-Let's see one more example. This code is based on real world code, that is modified for the purposes of this example.
+Let’s explore one more example, which is based on real-world code but modified for the purposes of this discussion.
 
 ```typescript
 async function findDomainUserByPhone(phoneNumber: string): Promise<DomainUser | null> {

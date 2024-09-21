@@ -3,17 +3,15 @@ layout: post
 author: kormang
 ---
 
+There are a few ways to parameterize generalized code:
 
-There are few ways to parameterize generalized code.
-
-* If the language we are using supports generics or templates (like C++), without type erasure (which means unlike Java, TypeScript), then we can create template class or function, and pass in concrete generic parameters to make the class or function concrete.
-* Overriding methods from superclass, or interface.
-* Pass the parameters that change behavior as call arguments to function.
-* Enable certain parameters that change behavior to be passed to constructor - dependency injection.
+* If the language supports generics or templates (like C++), without type erasure (unlike Java or TypeScript), we can create template classes or functions and pass in concrete generic parameters to make the class or function concrete.
+* Overriding methods from a superclass or interface.
+* Passing parameters that change behavior as arguments to functions.
+* Enabling certain parameters that alter behavior to be passed to the constructor—this is known as dependency injection.
 
 ## Generics
-
-Generics or templates, often used to implement data structure classes (like lists, trees, etc), can also be used to parameterize behaviors. That is why is is also called *parametric polymorphism*.
+Generics or templates, often used to implement data structure classes (like lists, trees, etc.), can also be employed to parameterize behaviors. This is why it is also called *parametric polymorphism*.
 
 Here is an example:
 
@@ -54,11 +52,11 @@ int main() {
 }
 ```
 
-Here, we have vector class, that is written in such way that it can be used with different allocation mechanism for its elements. That makes is pretty generalized, and responsibility for allocation and deallocation of memory is delegated away from the vector class. The reason why it is done using template parameter (*parametric polymorphism*), instead of runtime polymorphism is performance.
+Here, we have a vector class designed to work with different allocation mechanisms for its elements. This makes it quite generalized, as the responsibility for memory allocation and deallocation is delegated away from the vector class. The choice to use a template parameter (*parametric polymorphism*) instead of runtime polymorphism is primarily for performance reasons.
 
-In languages like Java and TypeScript such things are not possible, nor does it make sense. In TypeScript, when it gets compiled to JavaScript all types are erased and we always rely on runtime polymorphism.
+In languages like Java and TypeScript, such implementations are not possible, nor do they make sense. In TypeScript, when the code is compiled to JavaScript, all types are erased, and we always rely on runtime polymorphism.
 
-Still this is just illustration of the way units of code and their behavior can be parameterized.
+Still, this serves as an illustration of how units of code and their behavior can be parameterized.
 
 ## Override method from superclass
 
@@ -124,9 +122,9 @@ function isAboveThreshold(threshold) {
 const numbersAboveThreshold = numbers.filter(isAboveThreshold(20));
 ```
 
-Notice that we don't use `threshold` as a parameter to the predicate function, but as a wrapper function, that returns the predicate function. This wrapper function behaves like constructor for the predicate functions. This is necessary, because predicate function needs to conform the certain interface, namely to accept only one element, and return boolean. So we need another place, or make another level of indirection, to be able to write it in a generalized way. This is important detail to be aware of.
+Notice that we don't use `threshold` as a parameter to the predicate function; instead, we use a wrapper function that returns the predicate function. This wrapper function acts like a constructor for the predicate functions. This approach is necessary because the predicate function needs to conform to a specific interface: it must accept only one element and return a boolean. Therefore, we require another level of indirection to write it in a generalized way. This is an important detail to be aware of.
 
-Here is another example. We want to create an Express.js middleware to check if the request contains the "X-Data" header with the value "positive" and return a 400 error if it's not present or doesn't match the expected value.
+Here’s another example: we want to create an Express.js middleware to check if the request contains the "X-Data" header with the value "positive" and return a 400 error if it's not present or doesn't match the expected value.
 
 ```javascript
 // Custom middleware to check the "X-Data" header
@@ -175,151 +173,13 @@ app.get('/protectedRoute', checkHeaderValue('X-Data', 'positive'), (req, res) =>
 
 Again, we need another layer, that represents "constructor" for the middleware, in order to make it generally reusable.
 
-### Optional: Readability when passing behavior as call arguments
+### Dependency Injection Through Constructor
 
-Additionally, let's have a short discussion about readability of code that uses generalized functions.
+Dependency injection through the constructor is a pattern that helps us implement one of the SOLID principles, specifically the Dependency Inversion Principle.
 
-We've seen that generalized functions could be hard to read and understand, but the code that uses them is often very clean. However, not always. Let's look at few examples.
+Let's say we want to create a Java Servlet filter to check if the request contains the "X-Data" header with the value "positive" and return a 400 error if it's not present or doesn't match the expected value (the Java Servlet analog of the Express.js middleware example above).
 
-Consider you have two arrays, A and B. Array A contains objects of shape `{x: number, y: number}`, and array B
-contains object of shape `{z: number, y: number}`.
-
-Now, can you guess what this function does? Give yourself no more than a minute, and move to the next one, maybe it is simpler.
-
-```javascript
-function processAB1(A, B) {
-  const collection1 = []
-  const collection2 = []
-  const collection3 = []
-
-  for (let i = 0; i < A.length; ++i) {
-    let foundIndex = -1;
-    for (j = 0; j < B.length; ++j) {
-      if (A[i].y === B[j].y) {
-        foundIndex = j;
-        break;
-      }
-    }
-    if (foundIndex > -1) {
-      collection1.push({x: A[i].x, y: A[i].y, z: B[foundIndex].z });
-    } else {
-      collection2.push(A[i])
-    }
-  }
-
-  for (let i = 0; i < B.length; ++i) {
-    let foundIndex = -1;
-    for (j = 0; j < collection1.length; ++j) {
-      if (B[i].y === collection1[j].y) {
-        foundIndex = j;
-        break;
-      }
-    }
-    if (foundIndex === -1) {
-      collection3.push(B[i])
-    }
-  }
-
-  return {collection1, collection2, collection3}
-}
-```
-
-That is a lot of code. It isn't complicated, but it is a lot of code to read and try to understand.
-
-Is the next version easier to understand?
-
-```javascript
-function processAB2(A, B) {
-  const merge = (a, b) => b ? ({x: a.x, y: a.y, z: b.z }) : a
-  const merged = A.map(a => merge(a, B.find(b => a.y === b.y)))
-
-  const collection1 = merged.filter(e => 'z' in e)
-  const collection2 = merged.filter(e => !('z' in e))
-  const collection3 = B.filter(b => A.find(a => a.y === b.y) === undefined)
-
-  return {collection1, collection2, collection3}
-}
-```
-
-That is really compact. It is three times shorter than the previous one. But the code is really cryptic. It relies heavily on `map` and `filter`. Although in previous example using `filter` made code a bit easier to understand than `for` loop, here it is not so obvious. The reasons are:
-
-- code density - computation of `merged` array contains a lot of logic in a single line, or two.
-- dependencies on previous steps without steps being named - you as a reader, have to keep the results of one step in your head and process it in next step, and then again keep the intermediate results in your head till the end.
-
-Maybe the third version is easier to understand?
-
-```javascript
-function differenceOfSets(X, Y, equals) {
-  return X.filter(x => Y.find(y => equals(x, y)) === undefined)
-}
-
-function intersectionOfSets(X, Y, equals) {
-  const xIntersection = []
-  const yIntersection = []
-  X.forEach(x => {
-    const y = Y.find(y => equals(x, y))
-    if (y !== undefined) {
-      xIntersection.push(x)
-      yIntersection.push(y)
-    }
-  })
-
-  return [aIntersection, bIntersection]
-}
-
-function ABEquals(a, b) {
-  return a.y === b.y
-}
-
-function processAB3(A, B) {
-  const [aIntersect, bIntersect] = intersectionOfSets(A, B, ABEquals)
-
-  const collection1 = aIntersect.map((a, i) => ({x: a.x, y: a.y, z: bIntersect[i].z }))
-  const collection2 = differenceOfSets(A, B, ABEquals)
-  const collection3 = differenceOfSets(B, A, ABEquals)
-
-  return {collection1, collection2, collection3}
-}
-
-```
-
-The third version a bit shorter then first one, and it is more readable. Although the `processAB3` function itself is as short as the second one, there are more additional functions which together add up to roughly same amount of code as the first version. It is separated into clear, distinct steps, each step is named, names are given by helper functions. It would be even more readable if JavaScript had `zip` function to use instead of `map`. Another nice thing about it the we have created ourselves three reusable functions (`differenceOfSets`, `intersectionOfSets`, `ABEquals`), and at least two of them are useful outside of this task. It is however, less efficient than the first one, which computes `collection1` and `collection2` in one go, while third version takes 3 steps for the same task.
-
-In this particular case, if we value concise code, and reusability, we should take the third approach. If we want to have, maybe not so easily readable, but definitely understandable code, yet efficient code, we should take the first one. In fact, in that case we can definitely make it a bit shorter by using `find` or `findIndex` instead of inner loop. Also the second loop, to calculate `collection3` is hardly any better in terms of both readability and performance then `filter` + `find` as demonstrated in `differenceOfSets`. So some combination, would probably have the best of both worlds:
-
-```javascript
-function processAB4(A, B) {
-  const collection1 = []
-  const collection2 = []
-
-  A.forEach(a => {
-    const b = B.find(b => a.y === b.y)
-    const aHasMatchInB = b !== undefined
-    if (aHasMatchInB) {
-      collection1.push({x: a.x, y: a.y, z: b.z });
-    } else {
-      collection2.push(a)
-    }
-  })
-
-  const notInCollection1 = b => collection1.find(a => a.y === b.y) === undefined
-  const collection3 = B.filter(notInCollection1)
-
-  return {collection1, collection2, collection3}
-}
-```
-
-It is probably the most readable version and also concise, and performant enough.
-Notice how extracting `aHasMatchInB` and `notInCollection1` into separate, named, constants helps with readability. But again, some people might find other versions more readable and better, it is matter of taste, sometimes.
-
-
-### Dependency injection through constructor
-
-Dependency injection through constructor is a pattern that helps us implement one of the SOLID principles, namely, the Dependency Inversion principle.
-
-Let's say that we want to create Java Servlet filter to check if the request contains the "X-Data" header with the value "positive" and return a 400 error if it's not present or doesn't match the expected value (Java Servlet analog of the Express.js middleware example above).
-
-Hopefully, code is understandable enough even if you don't know Java, but you know TypeScript.
+Hopefully, the code is understandable enough even if you don't know Java but are familiar with TypeScript.
 
 ```java
 public class XDataHeaderFilter implements Filter {
@@ -387,9 +247,9 @@ public class FilterSetup {
 }
 ```
 
-As with the Express.js example above, `XDataHeaderFilter` has to implement certain interface, to be used by the parts of the system that use filters, so we can't add more parameters to `doFilter` method, and instead we parameterize it through constructor.
+As with the Express.js example above, `XDataHeaderFilter` must implement a certain interface to be used by the parts of the system that handle filters. This means we can't add more parameters to the `doFilter` method; instead, we parameterize it through the constructor.
 
-We can now go one step further, and compare not just the value of the header with the provided value, but check if it matches certain condition using predicate.
+We can now take it a step further and not only compare the value of the header with the provided value but also check if it matches a certain condition using a predicate.
 
 ```java
 public class CustomHeaderFilter implements Filter {
@@ -594,16 +454,21 @@ const webApp = new WebApp(
 
 (Did you even notice that it is not Java but TypeScript?)
 
-Now we see the problem that arises from dependency injection, and this is not all of it. Sometimes we want singleton instances, sometimes per-request instances, and so on.
+Now we encounter the problems that can arise from dependency injection, and this isn’t all of it. Sometimes we want singleton instances, other times per-request instances, and so on.
 
-This does not mean we should give up on dependency injection. It solves one important problem - making code reusable by parameterizing it. In the example above, we don't want to tightly couple `ReportingService` to a specific `AnalyticsService` or logging because in another place, we might want to use different implementations. Maybe you'll never need more than one instance of `UserService`, for example, but still, you'd like to easily replace parts of it when business needs require it. Also, at some point, you might want to reuse parts of `UserService` or some other service, and you thought you'd never going to need this, but as it turns out, that would be the most desirable way to implement some new request from the client.
+This doesn’t mean we should abandon dependency injection. It addresses an important issue: making code reusable by parameterizing it. In the example above, we don’t want to tightly couple `ReportingService` to a specific `AnalyticsService` or logging implementation because, in other contexts, we might want to use different implementations. You might never need more than one instance of `UserService`, for example, but you still want the flexibility to replace parts of it when business needs change. Additionally, there may come a time when you want to reuse parts of `UserService` or some other service, even if you initially thought that wouldn't be necessary.
 
-You might think - OK, I need `UserProfileService` as a dependency, and I'll never want another user profile service, and even if I do, I'll just change that one line in my WebApp constructor where I instantiate the `UserProfileService`. This way of thinking has a few problems.
-  * We are usually wrong with such assumptions.
-  * Often, with such an approach, people tend to write code inside (in this example) `WebApp` so that it depends on the specifics of the current implementation of `UserProfileService`, rather than the interface. So, using dependency injection can prevent development from going in the right direction. Dependency injection can protect the codebase, if not from you, who are aware of the problem, then from your colleagues, who see that you're depending on a specific implementation instantiated in the constructor and automatically assume the wrong things (namely that that can use methods or other specifics of the implementation, rather then interface).
-  * We're pushing the development in the wrong direction. If this becomes the norm, only when people are highly aware of the dependency injection pattern and the dependency inversion principle will they refactor it properly when the need to reuse parts of the code arises. Otherwise, the code might not even be refactored at all and may be duplicated instead.
-  * Without a "dependency injection culture" people may not even tend to extract parts of the logic into separate units of code (classes). They might consciously or unconsciously think, "What is the purpose of extracting it to another class if we're going to instantiate it right here in the constructor? Wouldn't it be easier to just write that code right here in this class?" So what we end up with is a hopelessly tightly coupled mix of responsibilities.
-  * We don't always need to know how to get an instance of a dependency. For example, when we write code for the `WebApp` constructor, we don't need to know how to get an instance of `UserProfileService`. It will be passed to us through the constructor, so we delegate responsibility for obtaining an instance of `UserProfileService` to other parts of the code. Additionally, in some cases, it also enables us to easily switch between singleton instances to per-request instances (in the case of backend software) or instances with different lifespans.
+You might think, "OK, I need `UserProfileService` as a dependency, and I'll never want another user profile service. Even if I do, I'll just change that one line in my WebApp constructor where I instantiate the `UserProfileService`." However, this way of thinking has a few problems:
+
+* We are often mistaken in such assumptions.
+
+* With this approach, developers tend to write code inside the `WebApp` that depends on the specifics of the current implementation of `UserProfileService`, rather than the interface. Dependency injection can prevent development from going in the wrong direction. It can protect the codebase from colleagues who may mistakenly assume they can use methods or other specifics of the implementation instantiated in the constructor, just because you have used concrete implementation in the constructor.
+
+* This can push development in the wrong direction. If this becomes the norm, only those who are highly aware of the dependency injection pattern and the dependency inversion principle will refactor the code properly when the need for reuse arises. Otherwise, the code might not be refactored at all and could end up duplicated.
+
+* Without a "dependency injection culture," people may hesitate to extract parts of the logic into separate units of code (classes). They might consciously or unconsciously think, "What’s the point of extracting it to another class if we’re just going to instantiate it right here in the constructor? Wouldn’t it be easier to write that code directly in this class?" This leads to a tightly coupled mix of responsibilities.
+
+* We don’t always need to know how to obtain an instance of a dependency. For instance, when writing code for the `WebApp` constructor, we don’t need to know how to get an instance of `UserProfileService`; it will be provided through the constructor. This allows us to delegate the responsibility for obtaining an instance of `UserProfileService` to other parts of the code. Moreover, in some cases, it enables easy switching between singleton instances and per-request instances (in the case of backend software) or instances with different lifespans.
 
 Even if you don't want to think about architecture, but you would like to have a good one, as a general rule of thumb, just pass things as dependencies to the constructor whenever you can. You will deal with instantiation later, somehow.
 
@@ -617,13 +482,13 @@ function getReportingService() {
 }
 ```
 
- But this solves only part of the problem.
+But this only solves part of the problem.
 
- Usually people use dependency injection containers. For example, for backend TypeScript there is NestJS' implementation. For frontend there is Angular's DI. For Java, the most popular is Spring Framework and Google Guice. For Android we have Dagger and Yatagan. For C++ Boost.DI.
+Typically, people use dependency injection containers. For example, in backend TypeScript, there’s NestJS; for frontend, Angular provides its own DI system. In Java, the most popular frameworks are Spring and Google Guice. For Android, there’s Dagger and Yatagan. In C++, you might use Boost.DI.
 
- Most of these libraries or frameworks use reflection to understand what dependencies certain classes have and to build a dependency graph. This is not possible for languages that have no or limited support for reflection, like C++. Some analyze code at compile time and generate instantiation code, while others allow us to specify dependencies in separate configuration files. This is a complex topic, and we should use DI frameworks only when things get complicated, or if we're already familiar with some of them, or if our framework for whatever we're trying to build (backend, frontend, mobile app) has one built in. Just remember to avoid hardwiring dependencies. If you decide to write your own solution because things are not too complex, make sure that you avoid reinventing the wheel and use a well-known and tested solution when things do get complex (unless no well-known solution meets your demands, which is more probable in more complex languages like C++ than with TypeScript or Java).
+Most of these libraries or frameworks utilize reflection to determine the dependencies of certain classes and build a dependency graph. This approach isn’t feasible in languages that have no or limited support for reflection, like C++. Some frameworks analyze code at compile time and generate instantiation code, while others allow us to specify dependencies in separate configuration files. This is a complex topic, and we should use DI frameworks only when things get complicated, or if we're already familiar with a particular framework, or if our chosen framework (for backend, frontend, or mobile app development) has one built in. It’s crucial to avoid hardwiring dependencies. If you decide to write your own solution because the situation isn’t overly complex, ensure you don’t reinvent the wheel; rely on a well-known and tested solution when complexity increases—unless you have specific needs that no established solution can meet, which is more likely in more complex languages like C++ than in TypeScript or Java.
 
-Another way to deal with dependency injection is Factory pattern.
+Another approach to handling dependency injection is the Factory pattern.
 
 ```typescript
 class ServiceDFactory {
@@ -644,11 +509,11 @@ class ServiceDFactory {
 
 ```
 
-Factories can also be used in combination with DI frameworks, and as dependencies themselves.
+Factories can also be used in conjunction with DI frameworks, and they can serve as dependencies themselves.
 
-Similarly, we can use Facade pattern. Basically, components that accept injected dependencies, together with those dependencies, form a complex graph, and not everybody needs to know how to put all those peaces together.
+Similarly, we can employ the Facade pattern. Essentially, components that accept injected dependencies, along with those dependencies, create a complex graph, and not everyone needs to understand how to assemble all those pieces.
 
-We will not get into detail about Facade pattern, but we can take a look at simple example to illustrate the technique:
+We won't delve into the details of the Facade pattern, but we can look at a simple example to illustrate the technique:
 
 ```typescript
 class ServiceFacade {
@@ -681,9 +546,9 @@ class ServiceFacade {
 
 ```
 
-We can have one big, or multiple smaller Facades like that one.
+We can have one large facade or multiple smaller facades like the one mentioned.
 
-There are other solutions similar to Facade. For example, in tensorflow with keras, a framework for training deep neural networks, we can configure and then compile neural network. To do that we need to specify, so called, loss function we want to use, and optimizer algorithm.
+There are other solutions similar to the Facade pattern. For example, in TensorFlow with Keras, a framework for training deep neural networks, we can configure and compile a neural network. To do this, we need to specify a loss function and an optimizer algorithm.
 
 ```python
 import tensorflow as tf
@@ -704,11 +569,11 @@ Of course, if we implement our own loss function, or our own optimizer, then we 
 
 ### Conclusion on dependency injection
 
-Dependency injection is a powerful pattern that can help us write better and more reusable code. Even if we instantiate concrete implementations one level above the code that uses those instances (for example, we instantiate concrete instances and pass them to the constructor of the class immediately) it is still much better then instantiating concrete implementation in the place where they are used. Often, it is enough.
+Dependency injection is a powerful pattern that can help us write better, more reusable code. Even if we instantiate concrete implementations just one level above the code that uses those instances (for example, by passing them to the constructor of a class immediately), it is still much better than instantiating concrete implementations directly where they are used. Often, this approach is sufficient.
 
-We should take our time, and think what to extract and where to instantiate certain implementations, and where to pass them. This time is not wasted, it will pay off.
+We should take our time to consider what to extract, where to instantiate certain implementations, and how to pass them. This time spent is not wasted; it will pay off in the long run.
 
-Because people tend not to do it, and generally it is desirable to do it in most cases, if we are overwhelmed, and can't think about every detail, just extract everything that makes sense, and accept it through constructor. Then if we are lazy to think about where it should be instantiated, make it at least inside some factory function, in the place where the constructor is called (for example). No need to complicate, no need for anything special, just inject dependencies using some of the approaches presented here. When we have time, we should think more carefully where exactly to instantiate those dependencies and how to pass them to the place where they are used.
+However, because people often overlook this, and since it's generally desirable to do so, if we feel overwhelmed and can't think through every detail, we can start by extracting everything that makes sense and accepting it through the constructor. If we're unsure where it should be instantiated, we can at least handle that within a factory function at the point where the constructor is called. There's no need to complicate things or create anything special—just inject dependencies using some of the approaches discussed here. When we have more time, we can think more carefully about where to instantiate those dependencies and how to pass them to the places where they are used.
 
 > Note that there is no rule that is applicable everywhere, and of course there are exceptions to every rule and best practice.
 

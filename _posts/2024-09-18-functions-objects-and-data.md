@@ -3,9 +3,6 @@ layout: post
 author: kormang
 ---
 
-
-(This section requires understanding code in different languages to fully understand the concepts. Detailed knowledge of those languages is not required, just basic reading and understanding of the code.)
-
 ## Functions are objects
 
 ```typescript
@@ -36,10 +33,10 @@ funcA.call(null, 1, 2)
 // Yes, in JavaScript functions are literally objects that have `call` method.
 ```
 
-In JavaScript (and TypeScript) functions, are literally objects, with prototype `Function`, and those objects can be called, either using regular call syntax, or calling method `call` on them.
+In JavaScript (and TypeScript), functions are literally objects, with the prototype `Function`, and these objects can be called either using regular call syntax or by calling the `call` method on them.
 
-This is not only characteristic of JavaScript.
-The same thing is in Python, functions are objects with `__call__` method. In Python, one can even make its own class with `__call__` method, and call the instance of the class as if it is regular function.
+This is not only a characteristic of JavaScript.
+The same applies in Python, where functions are objects with the `__call__` method. In Python, one can even create a custom class with a `__call__` method and call an instance of that class as if it were a regular function.
 
 ```python
 class ClsA:
@@ -143,11 +140,11 @@ std::sort(strings.begin(), strings.end(), CompareByStringLength);
 
 ```
 
-Hopefully, we've seen how functions and callable objects can be used interchangeably in different scenarios and languages. All these languages have different rules, limitations, and implementations when it comes to using functions as objects. However, what is common is that semantically, functions are objects and can, one way or another, be used interchangeably.
+Hopefully, we've seen how functions and callable objects can be used interchangeably in different scenarios and languages. Each of these languages has different rules, limitations, and implementations when it comes to using functions as objects. However, what is common is that, semantically, functions are objects and can, in one way or another, be used interchangeably.
 
-But this is not enough to say that functions are, in fact, objects. For functions to be fully recognized as objects, they need to be able to hold and update internal state. Certainly, in C, a function is just a place in memory where a sequence of machine instructions is stored, without any state, but C is really low level language, that lacks many of higher order constructs. This is not a critique of C, but it does not have objects at all, and is really close to assembly, so it's not that relevant for our talk here. However, certain patterns we see here can be used to better reason about code, and to design it better, even if it is written in C.
+But this is not enough to say that functions are, in fact, objects. For functions to be fully recognized as objects, they need to be able to hold and update internal state. In C, for instance, a function is just a place in memory where a sequence of machine instructions is stored, without any state. But C is a low-level language that lacks many higher-order constructs. This is not a critique of C, but it does not have objects at all and is very close to assembly, so it's not entirely relevant for our discussion here. However, certain patterns we observe can be useful in reasoning about and designing code more effectively, even when writing in C.
 
-Let's see how closure functions can be used to implement stateful object, in TypeScript.
+Now, let's see how closure functions can be used to implement stateful objects in TypeScript.
 
 ```typescript
 class ClsA {
@@ -182,7 +179,7 @@ console.log(fA(2))
 console.log(fA(3))
 ```
 
-As you can assume, the reason we use outer and inner function, is that the outer function serves as a constructor for our closure. Of course, constructors are not always as explicit as in this case, but constructors always do exist.
+As you can assume, the reason we use an outer and inner function is that the outer function serves as a constructor for our closure. Of course, constructors are not always as explicit as in this case, but they always exist in some form.
 
 Read [this]({% post_url 2024-09-06-parameterizing-code-with-behavior %}#call-arguments) part on code with behavior, to see another real world example where such pattern in used, and to better understand it. Read [this]({% post_url 2024-09-06-parameterizing-code-with-behavior %}#dependency-injection-through-constructor) part about dependency injection to see example where classes and constructors are used equivalently.
 
@@ -287,9 +284,9 @@ int main() {
 
 ```
 
-As we can see, `struct ClosureData` is used to store data that will later be used inside equivalent of the `run` function. To support that, we pass additional parameter to it, since in C the function is not a member of a class. The parameter `arg` emulates, `this` keyword in object oriented languages. Since, we don't have templates and generics, `pthread` expects function that accepts `void*` as argument, and later inside of the function we cast it to our struct, to get the data we need.
+As we can see, `struct ClosureData` is used to store data that will later be used inside the equivalent of the `run` function. To support that, we pass an additional parameter to it, since in C, the function is not a member of a class. The parameter `arg` emulates the `this` keyword in object-oriented languages. Since we don't have templates and generics, `pthread` expects a function that accepts `void*` as an argument, and later inside the function, we cast it to our struct to retrieve the necessary data.
 
-Here is one way to implement it in Python that illustrates the concept we're trying to understand.
+Here is one way to implement this concept in Python, which illustrates the idea we're trying to grasp.
 
 ```python
 import threading
@@ -327,13 +324,13 @@ We have seen three different approaches to pass data along with the function, in
 
 ## Parameterize with behavior
 
-We can, and in fact, we should, parameterize our objects and functions with other behavior, not just with data.
+We can, and in fact, we should, parameterize our objects and functions with behavior, not just with data.
 
-Let's say we have a video hosting platform, where people can upload their videos, and those who are subscribed can get notification about new video being uploaded (its not YouTube).
+Let’s say we have a video hosting platform where people can upload their videos, and those who are subscribed can get notifications about new videos being uploaded (it’s not YouTube).
 
-When new video gets uploaded, an event is enqueued into a queue. Then different event handlers, or queue consumers, which are subscribed to specific event get notified about the new video. Each does its own thing, but some things are common to all of them. For example, each consumer should validate data, as the event is send over the network as it not to be trusted. This can be optimized so that it is validated only once per process, but will serve us as and example anyway.
+When a new video gets uploaded, an event is enqueued into a queue. Then, different event handlers, or queue consumers, subscribed to specific events get notified about the new video. Each handler does its own task, but some responsibilities are common to all of them. For example, each consumer should validate the data, as the event is sent over the network and thus cannot be fully trusted. This validation could be optimized so that it's only performed once per process, but for now, it serves as a good example.
 
-Let's see how generalized consumer for 'video_published' event could look like.
+Let’s take a look at how a generalized consumer for the 'video_published' event might look.
 
 ```typescript
 export class VideoPublishedConsumer {
@@ -384,7 +381,7 @@ class NotifySubscribersConsumer {
 ```typescript
 new VideoPublishedConsumer(
   queueConnection,
-  new NotifySubscribersConsumer(getSubsFinder(), getEmailService())
+  new NotifySubscribersConsumer(1.0, getSubsFinder(), getEmailService())
 )
 ```
 
@@ -393,11 +390,11 @@ In this example, we use some subscribers finder to find subscribers for the auth
 ```typescript
 new VideoPublishedConsumer(
   queueConnection,
-  new NotifySubscribersConsumer(getSubsFinder(), getPushNotifService())
+  new NotifySubscribersConsumer(0.7, getSubsFinder(), getPushNotifService())
 )
 ```
 
-(This is not the most optimal way to implement it, but serves as an example for parameterizing with behavior)
+(In certain scenarios this might not be the most optimal way to implement it, but serves as an example for parameterizing with behavior)
 
 Similarly we can create other consumers.
 
@@ -408,11 +405,11 @@ new VideoPublishedConsumer(
 )
 ```
 
-We can use parameters, that are not meant to be state, in order to change behavior of certain class. Some of those parameters are behavior themselves. In class `NotifySubscribersConsumer` we have `percentage` parameter, that also changes the behavior of the class, but it is data that changes behavior. If it is less then 1, only specified percentage of randomly sampled subscribers will get notified (it is left to reader to imagine why would anyone on Earth want that).
+We can use parameters to change the behavior of a class, and some of these parameters represent behavior themselves. These parameters are not intended to represent state. In the class `NotifySubscribersConsumer`, for example, the `percentage` parameter changes the behavior of the class—though it is data, it directly influences behavior. If the percentage is less than 1, only a specified portion of randomly sampled subscribers will be notified (I’ll leave it to the reader to ponder why anyone would want that).
 
-Both `VideoPublishedConsumer` and `NotifySubscribersConsumer` (`UpdateStatsConsumer` too, but the code is not presented) have parameters that are not data, and certainly not state, but rather behavior.
+Both `VideoPublishedConsumer` and `NotifySubscribersConsumer` (as well as `UpdateStatsConsumer`, though its code is not shown) have parameters that are neither pure data nor state, but rather influence behavior.
 
-Now, we will see how that looks like in more pure form of behavior - functions.
+Now, let’s explore how this concept appears in a purer form of behavior — functions.
 
 ```typescript
 export async function subscribeVideoPublishedConsumer(
@@ -527,23 +524,21 @@ const lc = new LengthCounter(1)
 console.log(lc.count("Hello"))
 console.log(lc.count("World"))
 ```
-
 Here, we do have internal state, but we don't have any getter or setter for that state.
 
-Object Oriented Programming (OOP) promises encapsulation, and loose coupling, but almost every course on OOP teaches us about class `Vehicle`, and subclass `Car` that has properties like `model`, `engine` and so on. Also, we've been thought to make getters, and setters, to encapsulate those fields so that someone from the outside can't access those fields directly. But the truth is - it doesn't help. Yes, we can put some logic in setter to make sure that the value is valid, or to do some other necessary logic on setting the value. But we've still exposed that field, and other code depends on that field, and expects that it can get value after setting it.
+Object-Oriented Programming (OOP) promises encapsulation and loose coupling, but almost every course on OOP teaches us about the class Vehicle and its subclass Car, which has properties like model, engine, and so on. We've also been taught to create getters and setters to encapsulate those fields so that external code can't access them directly. But the truth is—it doesn't help. Yes, we can put some logic in the setter to ensure the value is valid or to perform other necessary actions when setting the value. But we've still exposed that field, and other code depends on it, expecting that it can retrieve the value after setting it.
 
-Later it drives us towards API design that requires client to "always set certain value, before calling certain methods". That in its turn, leads us to nasty type of bugs like "Oh, I've forgot to return old value, after calling that method", or "that value has been set by someone in the mean time, before I got chance to call the method".
+This approach eventually leads us to API designs that require the client to "always set a certain value before calling certain methods." This, in turn, leads to nasty bugs like, "Oh, I forgot to return the old value after calling that method," or "That value was set by someone else in the meantime before I had a chance to call the method."
 
-These classes of bugs are eliminated when using pure functional programming, which implies that no state is mutable, or that all data is immutable - once initialized it can not change anymore. It is however not always practical, and often much more efficient to have mutable variables, arrays, etc. Mutability is often more efficient when we talk about local data, local state, local variables, in the "micro world". But in "macro world", when we talk about scale of modules, and large programs, keeping track of who changed what state is difficult and leads to mentioned bugs. So the more state is localized, and hidden the better, and if we can have immutable objects (like `String` class in many languages, like Python, JavaScript, and Java) even better. If having immutable object is impractical or inefficient, than at least we should hide it, as if it is local state of the closure function, and definitely avoid getters and setters.
+These types of bugs are eliminated when using pure functional programming, which implies that no state is mutable and that all data is immutable—once initialized, it cannot change. However, this isn't always practical, and it's often much more efficient to have mutable variables, arrays, etc. Mutability is often more efficient when we talk about local data, local state, and local variables in the "micro world." But in the "macro world," when we talk about modules and large programs, keeping track of who changed what state is difficult and leads to the aforementioned bugs. So, the more state is localized and hidden, the better. If we can use immutable objects (like the String class in many languages such as Python, JavaScript, and Java), even better. If having immutable objects is impractical or inefficient, we should at least hide the state as if it were local to a closure function and definitely avoid getters and setters.
 
-Basically, functions are objects, and as it seems objects are also just functions?
+Basically, functions are objects, and, as it seems, objects are also just functions?
 
-Well, yes and no. Most of the objects are just behavior, or should be just behavior, thus should behave like closure functions.
+Well, yes and no. Most objects are just behavior, or should be just behavior, and thus should behave like closure functions.
 
-So why do we even use objects, why don't we always use closure functions?
+So why do we even use objects? Why don't we always use closure functions?
 
-First, there are objects that are not behavior.
-Then there are functions that are often used together, for example `addEventListener`, `removeEventListener`. In such case it is easier to implement it as object. We can implement it like this.
+First, there are objects that are not purely behavior. Then there are functions that are often used together, such as `addEventListener` and `removeEventListener`. In such cases, it is easier to implement them as objects. We can implement them like this.
 
 ```javascript
 function createEventEmitter() {
@@ -560,22 +555,23 @@ function createEventEmitter() {
 }
 ```
 
-But, here we have get to the third reason not to use functions all the time. We certainly can use functions always, and that approach has some advantages due to that uniformity and isomorphism. Certainly, LISP, has everything represented as lists, and that feature of LISP, called homoiconicity, makes it extremely flexible and expressive, but at the same time it is hard for humans to read, exactly because everything looks the same. It seems that we humans need certain marks in the code to be able to more easily identify the meaning of it. When we see words like `class` and `constructor` we better and more instantaneous identify the meaning of the code compared to seeing word `function` (and the `function` is in its turn "easier" on the eyes than reading code that consists exclusively of lists). We need to analyze that structure of the `function` to recognize the pattern it represents. Also depending on the language it might be impossible or impractical to create object with methods as shown in the example above. So both approaches have their pros and cons.
+But here we arrive at the third reason not to use functions all the time. While it’s certainly possible to always use functions—and that approach has advantages due to its uniformity and isomorphism—there are downsides. LISP, for example, represents everything as lists, and this feature, called homoiconicity, makes LISP extremely flexible and expressive. However, it also makes LISP hard for humans to read because everything looks the same. It seems that we humans need certain markers in the code to more easily identify its meaning. When we see words like `class` and `constructor`, we more quickly and easily grasp the meaning of the code compared to seeing the word `function`. Even `function` is "easier" on the eyes than reading code that consists exclusively of lists. We have to analyze the structure of a `function` to recognize the pattern it represents. Additionally, depending on the language, it might be impossible or impractical to create objects with methods as shown in the earlier example. So, both approaches have their pros and cons.
 
-Let's now return to the first point - not all objects represent behavior. Some objects are explicitly made to hold data. Such objects behave like `struct`s in C language (have just properties, no methods), or have getter, setters, and few other helper function that do not mutate state (e.g. `toString`, or comparison methods, `equals` or overloaded operator `==`). Sometimes they are called Data Transfer Objects (DTOs), or instances of data classes. It is good practice to treat them as immutable **values**. Good example of that pattern are data classes in Kotlin language.
+Now, let's return to the first point—not all objects represent behavior. Some objects are explicitly designed to hold data. Such objects behave like `struct`s in C (they only have properties, no methods), or they have getters, setters, and a few other helper functions that do not mutate state (e.g., `toString`, comparison methods like `equals`, or overloaded operators like `==`). These are sometimes called Data Transfer Objects (DTOs) or instances of data classes. It is a good practice to treat them as immutable **values**. A good example of this pattern is the data classes in Kotlin.
 
-There is also third type of objects, that are explicitly made to hold mutable state. Those objects are data structures. For example, list, hash table, and so on. Their whole purpose is to have mutable state. They however, don't have getters and setters for individual fields.
+There is also a third type of object, explicitly designed to hold mutable state: data structures. For example, lists, hash tables, and so on. Their entire purpose is to maintain mutable state. However, they don't have getters and setters for individual fields.
 
 
 ## Conclusion
 
 We have seen that functions are just callable objects.
 
-We have seen that objects can belong to one of the three categories, and that we should avoid objects with setters.
+We've also established that objects can belong to one of three categories, and we should avoid objects with setters.
 
 The three categories are:
 
-1. Behavior objects - basically functions, or group of functions. They better be immutable, but even if they have mutable state, it should be hidden and obscure the same way internal state of closure is hidden and obscure. They can be parameterized with some data and other behavior that affects the behavior of instantiated object, and that data and behavior can be saved as local immutable state of the object/closure.
-2. Data objects - like `struct`s in C, but can have methods like `toString`, `equals`, etc. Usually treated as immutable values. A good example is data classes in Kotlin.
-3. Data structures - their whole purpose is to hold and manage mutable state in an efficient way (e.g. list, vector, hash table, and so on).
+1. **Behavior Objects**: Essentially functions or groups of functions. They are ideally immutable, but even if they have mutable state, it should be hidden and obscured, much like the internal state of a closure. They can be parameterized with data and other behaviors that influence the instantiated object's behavior, and this data and behavior can be saved as local immutable state within the object or closure.
 
+2. **Data Objects**: Similar to `struct`s in C, but they can also have methods like `toString`, `equals`, etc. They are usually treated as immutable values. A good example of this pattern is data classes in Kotlin.
+
+3. **Data Structures**: Their primary purpose is to hold and manage mutable state efficiently (e.g., lists, vectors, hash tables, etc.).
