@@ -486,7 +486,7 @@ type Consumer = <T>(data: T) => Promise<void>
 
 As we can see both objects and functions represent behavior.
 
-## State
+## Managing State
 
 Let's see one more time how objects and function, both can have state.
 
@@ -524,11 +524,34 @@ const lc = new LengthCounter(1)
 console.log(lc.count("Hello"))
 console.log(lc.count("World"))
 ```
+
 Here, we do have internal state, but we don't have any getter or setter for that state.
 
 Object-Oriented Programming (OOP) promises encapsulation and loose coupling, but almost every course on OOP teaches us about the class Vehicle and its subclass Car, which has properties like model, engine, and so on. We've also been taught to create getters and setters to encapsulate those fields so that external code can't access them directly. But the truth is—it doesn't help. Yes, we can put some logic in the setter to ensure the value is valid or to perform other necessary actions when setting the value. But we've still exposed that field, and other code depends on it, expecting that it can retrieve the value after setting it.
 
 This approach eventually leads us to API designs that require the client to "always set a certain value before calling certain methods." This, in turn, leads to nasty bugs like, "Oh, I forgot to return the old value after calling that method," or "That value was set by someone else in the meantime before I had a chance to call the method."
+
+Here’s an example of the problem I’ve encountered, which, while extreme, effectively illustrates the issue. I’ve seen a class with a method we’ll call `doSomething()`. However, before calling `doSomething()`, the caller is expected to call `setFieldA()` and `setFieldB()` with the appropriate values. These fields were never used by any other method in the class and could have easily been replaced by arguments in the `doSomething()` method itself.
+
+Interfaces like these create several problems. For instance, consider the following code:
+
+```java
+obj.setFieldA(aObj);
+obj.setFieldB(bObj);
+obj.doSomething();
+```
+
+but then immediately following that code we add:
+
+```java
+subprocedure(obj);
+obj.setFieldB(bObj2);
+obj.doSomething();
+```
+
+Field A could be changed by a `subprocedure`. While this may not happen now, in the future, someone might introduce a change that does modify it. In place of the call to `subprocedure`, there could be a large block of code — 50 lines or more — where such a change could be introduced. This makes the code highly prone to break in the future.
+
+Setters are particularly problematic. While getters can be useful in certain languages to ensure immutability of fields (if no other mechanism exists), setters, on the other hand, allow anyone, from any part of the code, to modify the value. This often leads to the aforementioned bugs and state management issues. It's crucial to ensure that state cannot be changed from arbitrary parts of the code.
 
 These types of bugs are eliminated when using pure functional programming, which implies that no state is mutable and that all data is immutable—once initialized, it cannot change. However, this isn't always practical, and it's often much more efficient to have mutable variables, arrays, etc. Mutability is often more efficient when we talk about local data, local state, and local variables in the "micro world." But in the "macro world," when we talk about modules and large programs, keeping track of who changed what state is difficult and leads to the aforementioned bugs. So, the more state is localized and hidden, the better. If we can use immutable objects (like the String class in many languages such as Python, JavaScript, and Java), even better. If having immutable objects is impractical or inefficient, we should at least hide the state as if it were local to a closure function and definitely avoid getters and setters.
 
@@ -542,20 +565,42 @@ First, there are objects that are not purely behavior. Then there are functions 
 
 ```javascript
 function createEventEmitter() {
-  const handlers = {}
+  const handlers = {};
+
   return {
     addEventListener(eventName, listener) {
-      /* add listener to handlers */
-    }
+      if (!handlers[eventName]) {
+        handlers[eventName] = [];
+      }
+      handlers[eventName].push(listener);
+    },
     removeEventListener(eventName, listener) {
-      /* remove listener from handlers */
+      if (!handlers[eventName]) return;
+
+      handlers[eventName] = handlers[eventName].filter(l => l !== listener);
+    },
+    emit(eventName, ...args) {
+      if (!handlers[eventName]) return;
+
+      handlers[eventName].forEach(listener => listener(...args));
     }
-    // other methods
-  }
+  };
 }
 ```
 
-But here we arrive at the third reason not to use functions all the time. While it’s certainly possible to always use functions—and that approach has advantages due to its uniformity and isomorphism—there are downsides. LISP, for example, represents everything as lists, and this feature, called homoiconicity, makes LISP extremely flexible and expressive. However, it also makes LISP hard for humans to read because everything looks the same. It seems that we humans need certain markers in the code to more easily identify its meaning. When we see words like `class` and `constructor`, we more quickly and easily grasp the meaning of the code compared to seeing the word `function`. Even `function` is "easier" on the eyes than reading code that consists exclusively of lists. We have to analyze the structure of a `function` to recognize the pattern it represents. Additionally, depending on the language, it might be impossible or impractical to create objects with methods as shown in the earlier example. So, both approaches have their pros and cons.
+Note that `addEventListener`, `removeEventListener`, and `emit` share a common state. Objects that have more than one function are not analogous to a function — or more precisely, a closure — that has its internal state. They are similar to multiple closures sharing that state. However, just like closures that share internal state via captured local variables, classes should keep fields private, treating them as implementation details.
+
+If you introduce a setter that modifies a value, it becomes reasonable to expect a corresponding getter to retrieve that value later. This turns the field from being an implementation detail to becoming part of the public interface, despite the control and encapsulation that setters and getters can provide.
+
+Being aware that classes are just one way to group functions so they share common internal/private state can be challenging if you haven’t worked in languages that use closures extensively. Even if you’re programming in C++, it's beneficial to explore languages that rely heavily on closures to shift your paradigm and broaden your perspective. C++11 lambdas can help, but not as much.
+
+Use classes, or groups of closures, to make them share common private/internal state.
+
+### Closures and readability
+
+Here we arrive at the third reason not to use functions all the time. While it’s certainly possible to always use functions—and that approach has advantages due to its uniformity and isomorphism—there are downsides. LISP, for example, represents everything as lists, and this feature, called homoiconicity, makes LISP extremely flexible and expressive. However, it also makes LISP hard for humans to read because everything looks the same. It seems that we humans need certain markers in the code to more easily identify its meaning. When we see words like `class` and `constructor`, we more quickly and easily grasp the meaning of the code compared to seeing the word `function`. Even `function` is "easier" on the eyes than reading code that consists exclusively of lists. We have to analyze the structure of a `function` to recognize the pattern it represents. Additionally, depending on the language, it might be impossible or impractical to create objects with methods as shown in the earlier example. So, both approaches have their pros and cons.
+
+### Not all objects are behavior
 
 Now, let's return to the first point—not all objects represent behavior. Some objects are explicitly designed to hold data. Such objects behave like `struct`s in C (they only have properties, no methods), or they have getters, setters, and a few other helper functions that do not mutate state (e.g., `toString`, comparison methods like `equals`, or overloaded operators like `==`). These are sometimes called Data Transfer Objects (DTOs) or instances of data classes. It is a good practice to treat them as immutable **values**. A good example of this pattern is the data classes in Kotlin.
 
@@ -570,7 +615,7 @@ We've also established that objects can belong to one of three categories, and w
 
 The three categories are:
 
-1. **Behavior Objects**: Essentially functions or groups of functions. They are ideally immutable, but even if they have mutable state, it should be hidden and obscured, much like the internal state of a closure. They can be parameterized with data and other behaviors that influence the instantiated object's behavior, and this data and behavior can be saved as local immutable state within the object or closure.
+1. **Behavior Objects**: Essentially functions or groups of functions. They are ideally immutable, but even if they have mutable state, it should be hidden and obscured, much like the internal state of a closure. They can be parameterized with data and other behaviors that influence the instantiated object's behavior, and this data and behavior can be saved as local immutable state within the object or closure. (More about that in [in this post]({% post_url 2024-09-06-parameterizing-code-with-behavior %}))
 
 2. **Data Objects**: Similar to `struct`s in C, but they can also have methods like `toString`, `equals`, etc. They are usually treated as immutable values. A good example of this pattern is data classes in Kotlin.
 
