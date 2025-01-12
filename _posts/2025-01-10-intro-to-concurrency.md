@@ -146,7 +146,7 @@ Hello from other thread
 ...
 ```
 
-Exact output depends on a lot of circumstances, and might be different each time we run the program, because those two functions, `keyboard_thread` and `message_thread` are running at the same time (if there are two CPUs then literally, otherwise with time-sharing).
+The exact output depends on many circumstances and might differ each time we run the program, because the two functions, `keyboard_thread` and `message_thread`, are running simultaneously (literally if there are two CPUs, otherwise with time-sharing).
 
 Threads can also be used for parallel computing. A typical example is finding the sum of numbers in a very large array. For each CPU core, we start a new thread, and each thread sums a portion of the array. If there are 8 cores, each core will sum 1/8th of the whole array, and at the end, these partial sums will be combined. This speeds up processing by dividing the work among CPU cores, with each core running one thread. However, our current focus is on concurrent programming.
 
@@ -270,15 +270,15 @@ void on_key_pressed(char c) {
 
 ```
 
-Finally when newly scheduled task starts waiting for some IO operation, or the time for preemptive multitasking ticks out, newly scheduled task will be "kicked out", and the task that got the keyboard input might get its chance to run again.
+Finally, when a newly scheduled task starts waiting for an I/O operation or the time for preemptive multitasking runs out, the newly scheduled task will be "kicked out," and the task that received the keyboard input might get a chance to run again.
 
-It will then simply wake up and return from `getc` function with pressed character as result (this requires some assembly magic, so we will skip that).
+It will then simply wake up and return from the `getc` function with the pressed character as the result (this requires some assembly magic, so we will skip that).
 
-OS can also offer **non-blocking APIs**.
+The OS can also offer **non-blocking APIs**.
 
-Non-blocking APIs are typically implemented using **polling** - application does not sleep while waiting, instead it is constantly asking OS if there is some IO operation that is completed.
+Non-blocking APIs are typically implemented using **polling**—the application does not sleep while waiting; instead, it constantly asks the OS if any I/O operation has been completed.
 
-At least in theory OS can also offer asynchronous API, which calls event handlers in application, when ever desired IO operation is completed. In practice polling is used, but there are user-space libraries that turn polling into event handling API for application to use. These libraries use **event loops**, which will be the subject for the next post in this series.
+At least in theory, the OS can also offer asynchronous APIs that call event handlers in the application whenever the desired I/O operation is completed. In practice, polling is commonly used, but there are user-space libraries that turn polling into an event-handling API for applications to use. These libraries use **event loops**, which will be the subject of the next post in this series.
 
 ### Application using event handlers
 
@@ -288,7 +288,7 @@ Application code runs in what is called user space. Unlike kernel space, user sp
 
 The kernel can call an event handler for a new character when a keyboard key is pressed, and user space code can accept this new character in this way.
 
-Now, let's see how it would look to write an application that accepts new keys and performs desired actions depending on which key is pressed. We will write a simple application in C (but simple C that should be **understandable to anyone**). The application has a primitive user interface and limited functionality.
+Now, let's see how it would look to write an application that accepts new keys and performs desired actions depending on which key is pressed. We will write a simple application in C (but simple C that should be understandable to anyone). The application has a primitive user interface and limited functionality.
 
 First, the user is supposed to enter key '1' to work with customer records, '2' to generate a report. When working with customer records, we can select sub-options - again '1' to add a new customer, '2' to edit an existing customer, and '3' to delete a customer. When generating a report, we can select '1' to generate a yearly report, or '2' for a monthly report.
 
@@ -499,15 +499,15 @@ Although parts could be extracted into separate functions, it is still much more
 
 We know that multiple processes can run on the computer, each doing something different, at the same time, concurrently. Each of these processes can also do multiple things at once by starting multiple threads. To give each process and thread a chance to run, the OS relies on either:
 
-* Regular timer interrupts to prevent a single thread from taking too long. This can interrupt the execution of the thread at any time, at any instruction. This is called **preemptive multitasking**.
+* Regular timer interrupts to prevent a single thread from taking too long. This can interrupt the execution of the thread at any time, at any instruction. This is called preemptive multitasking.
 * Calls to blocking kernel APIs, during which the kernel can put the caller thread to sleep until the data it is waiting for is ready, and put another thread to work during that time.
 
 IO APIs can be either blocking or non-blocking. Blocking APIs are traditional APIs, like `getc`, which put application to sleep until IO operation is ready.
 
-Non-blocking APIs use polling approach.
+Non-blocking APIs use a polling approach.
 
-There are also asynchronous APIs, that calls event handlers. This is usually used on the hardware level and by applications that use event loop.
+There are also asynchronous APIs that call event handlers. These are typically used at the hardware level and by applications that utilize an event loop.
 
-We took a glimpse at how event handling approach can be translated to blocking approach by the OS (when key is pressed event handler is called in OS kernel, but OS presents it as blocking API to applications).
+We briefly examined how the event-handling approach can be translated into a blocking approach by the OS. For example, when a key is pressed, an event handler is triggered in the OS kernel, but the OS presents this as a blocking API to applications.
 
-In fact all these approaches to IO can be turned from one to another by adding additional layers of indirection. OS can turn event handling to blocking, or polling approach. A library can turn polling approach back to event handling using event loop (which will be subject of the next post), or to blocking (which will be subject of one of the future posts in this series).
+In fact, all these approaches to I/O can be converted from one to another by adding additional layers of abstraction. The OS can convert event handling to a blocking or polling approach. Similarly, a library can transform a polling approach back into event handling using an event loop (which will be the subject of the next post) or into a blocking approach (to be discussed in a future post in this series).
