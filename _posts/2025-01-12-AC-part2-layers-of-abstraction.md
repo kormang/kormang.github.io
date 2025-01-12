@@ -3,7 +3,7 @@ layout: post
 author: kormang
 ---
 
-This post introduce you to the following observation:
+This post will introduce you to the following observation:
 
 **Just as any program written using iteration can be rewritten using recursion, any program that uses event handlers (callbacks) can be rewritten using polling or "async functions" (coroutines). There is no better approach, there is only more convenient approach for specific use case and situation.**
 
@@ -278,7 +278,7 @@ void on_character(char c) {
 
 Maybe it adds a bit of readability, but still not enough, fundamentally it is the same.
 
-### Alternative to callbacks and state machines
+### Application using blocking IO
 
 What we want is a code that does not use char handler, but that calls `getc`.
 
