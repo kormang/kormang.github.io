@@ -5,6 +5,8 @@ author: kormang
 
 Asynchronicity and concurrency are difficult subjects, and this post is as well. This post is first (and the most boring) post in a series of posts that tend to explain how asynchronous programming and concurrency work. After reading this series of posts, asynchronicity and concurrency should no longer be a mystery.
 
+Most examples will be in one of the three languages: Python, JavaScript and C. Most people should be able to read and understand these languages. C will be used only when it doesn't make sense to use Python or JavaScript. Later we will see how to build event loop and use async functions on top of it, in C++ as well. We will have examples in few other languages as well, when it makes sense, with the goal of broadening our perspective.
+
 _Study each code example carefully, copy it and run it. Try to change something, and run it again; try to find bugs, try to find answers to remaining questions. That is the process of learning. If you're not familiar with some of the languages used in the examples, feel free to skip them, but it's better to try to understand them._
 
 The first post will introduce basic concepts.
@@ -176,4 +178,4 @@ Matrix multiplication, finding the maximum number in an array, image processing,
 
 ## Up next
 
-Next we will see how concurrency work on different layer on abstraction, from hardware, to OS, to application. We will also see different approaches to concurrency - blocking, polling, event handling, and how one turns into another.
+Next we will see how concurrency work on different layers on abstraction, from hardware, to OS, to application. We will also see different approaches to concurrency - blocking, polling, event handling, and how one turns into another.
