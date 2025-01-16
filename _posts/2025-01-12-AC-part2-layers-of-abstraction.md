@@ -89,6 +89,8 @@ void on_key_pressed(char c) {
   if (t) {
     // If there is such task, then put the character in the register that will
     // hold the result of `getc` function call, when the task wakes up again.
+    // If we put it in eax register calling convention says that the task will
+    // observe this value as return value of the function call.
     t->registers.eax = c;
     // Also, this means that this task is no longer waiting for keyboard,
     // so clear that tag.
