@@ -37,11 +37,22 @@ That C(-like) code is compiled into machine instructions and executed by the CPU
 
 In the second case, when the CPU is interrupting the program, for example, the CPU is executing instructions that belong to a specific function (let's say the function belongs to the OS kernel), and suddenly it receives an interrupt signal. Instead of continuing the execution of the next instruction, the CPU itself jumps to an instruction that is located in a predefined memory location for that kind of signal. At that memory location, there is a function which is usually called an Interrupt Service Routine (ISR). So, if we want to process a certain signal in a specific way, we need to put instructions that do the processing at that location (which is analogous to registering an event listener in high-level languages). Most of the CPUs behave this way.
 
-Simply put, when CPU receives signal from IO device, it will stop doing what ever it was doing, and start executing Interrupt Service Routine (ISR), which is equivalent of event handler for events like mouse move, screen touch, new data received over network, etc.
+Simply put, when the CPU receives a signal from an I/O device, it stops whatever it was doing and starts executing an Interrupt Service Routine (ISR). The ISR acts as an event handler for events such as mouse movements, screen touches, or new data received over the network.
 
 Just out of curiosity, let's briefly examine how this works in a toy operating system for processors with x86 architecture.
 
 _In this OS, "task" is common name for both process and thread (in Linux threads are called light weight processes, because there is not much difference between the two when it comes to scheduling)._
+
+Now let's look at the `getc` function, how it works actually. Let's remind ourselves what it is.
+
+In C programming language we can read single character that is pressed on the keyboard. To do this, we can simple call `getc` function. It is similar to python's `c = input()` but just for single character.
+
+```c
+char c = getc(); // We we press key on the keyboard getc will return pressed character.
+```
+
+We mentioned `getc` in the [previous post](/2025/01/11/AC-part1-intro-to-concurrency.html#what-happens-when-we-wait-on-getc), with more details.
+
 
 The function below is what gets called in the kernel when program calls `getc`.
 
@@ -58,7 +69,7 @@ It will mark current task as waiting for keyboard input, and then it will switch
 
 _The function `switch_task_from_isr` is called that way because `sc_getc` also runs in a ISR, but it has to do with how system calls (switching from user space program to kernel) work on x86 CPUs._
 
-Next is how the keyboard ISR looks like. Additional assembly code is needed to register this function as keyboard interrupt handler, but eventually CPU will call this function when key is pressed on the keyboard, and corresponding signal is sent from keyboard to CPU.
+Next, let's look at how the keyboard ISR looks like. Additional assembly code is needed to register this function as keyboard interrupt handler, but eventually CPU will call this function when key is pressed on the keyboard, and corresponding signal is sent from keyboard to CPU.
 
 ```c
 static void keyboard_handler(registers_t* regs) {

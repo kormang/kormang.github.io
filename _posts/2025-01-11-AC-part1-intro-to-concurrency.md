@@ -53,10 +53,10 @@ To support hardware and memory isolation from processes, the OS needs hardware s
 
 ### What happens when we wait on 'getc'
 
-In C programming language we can read single character that is pressed on the keyboard. To do this, we can simple call `getc` function.
+In C programming language we can read single character that is pressed on the keyboard. To do this, we can simple call `getc` function. It is similar to python's `c = input()` but just for single character.
 
 ```c
-char c = getc();
+char c = getc(); // We we press key on the keyboard getc will return pressed character.
 ```
 
 Process that calls `getc` will stop execution until key is pressed. This is not asynchronous API, it is blocking API.
