@@ -1,7 +1,12 @@
+---
+layout: post
+author: kormang
+---
+
 
 ## Coroutines in Python
 
-Similar to JavaScript, Python has concept of iterable and iterator, that are basically the same but are implemented a bit differently.
+Similar to JavaScript, Python has concept of iterable and iterator, that are basically the same thing but are implemented a bit differently.
 
 ### Iterators and iterables
 
