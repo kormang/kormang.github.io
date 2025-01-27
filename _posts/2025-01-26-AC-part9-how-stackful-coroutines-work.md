@@ -405,7 +405,7 @@ As we can see, two coroutines were constantly switching between one another.
 
 What we saw here is similar to what OS is doing with threads and processes, but here we do that in user space.
 
-In practice functions like `coro_suspend_and_yield_to_other` will be from functions like `read_from_network_socket` when there are no data to be read and coroutine has to wait for data to be received. By that time, another coroutine can be scheduled to run in its place.
+In practice functions like `coro_suspend_and_yield_to_other` are called from hypothetical functions like `read_from_network_socket` when there are no data to be read and coroutine has to wait for data to be received. By that time, another coroutine can be scheduled to run in its place. Scheduler can use polling, and non-blocking OS API to implement it. More info about polling and non-blocking APIs can be found here [here](/2025/01/16/AC-part3-how-event-loops-work.html).
 
 To give you an idea how that works with non-blocking IO, using event loop and stackless coroutines in Python, take a look at this post - [How Python coroutines work](/2025/01/25/AC-part7-how-to-write-your-own-event-loop-for-python-async-funcs.html).
 
