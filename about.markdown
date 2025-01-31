@@ -13,7 +13,7 @@ permalink: /about/
 
 ### Senior Software Engineer
 
-With over 10 years of experience in software development, learned to be pragmatic and have a product mindset. Passionate about AI.
+With over 10 years of experience in wide spectrum of technologies. Professional and pragmatic. Passionate about AI.
 
 Skilled in C++, C, Python, JavaScript.
 <3 Linux.
@@ -110,6 +110,17 @@ Skilled in C++, C, Python, JavaScript.
 - One of the major [contributors](https://github.com/spectralpython/spectral/pulls?q=is%3Apr+author%3Akormang) to Spectral Python (machine learning and hyperspectral image analysis library).
 - Invented and contributed fastest algorithm (at least publicly available) for computing upper convex hull, applied it to computing continuum of spectral signatures.
 
+## Fun/toy projects
+
+### Stupidos
+
+[Toy operating system](https://github.com/kormang/stupidos) for x86 platform using C, NASM, and GASM.
+
+> A breath of fresh air in the ever expanding world of smart things.
+
+- Implemented features: bootloader, protected mode, memory paging, interrupts, preemptive multitasking, user-mode, demo user-space program with blocking sys calls and starting child program.
+- Syscalls: `putc`, `puts`, `puthex`, `getc`, `fork`, `exit`
+- Developed exclusively on hardware, no qemu or other emulation.
 
 ## Education
 
