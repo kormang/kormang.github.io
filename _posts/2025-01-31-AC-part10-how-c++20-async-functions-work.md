@@ -1,4 +1,3 @@
-
 ---
 layout: post
 author: kormang
@@ -297,14 +296,15 @@ struct Scheduler {
 
         // Run the loop.
         while (true) {
-            // First check if there are timers that are ready, and resume corresponding
-            // coroutines.
+            // First check if there are timers that are ready,
+            // and resume corresponding coroutines.
             while (timers_.size() && timers_.top().first < epoch_time_ms()) {
                 timers_.top().second.resume();
                 timers_.pop();
             }
 
-            // Now check if there are file descriptors that are ready for reading, and
+            // Now check if there are file descriptors that
+            // are ready for reading, and
             // resume corresponding coroutines.
             int nfds = epoll_wait(epoll_fd_, events_.data(), events_.capacity(), 100);
             for (int i = 0; i < nfds; ++i) {
