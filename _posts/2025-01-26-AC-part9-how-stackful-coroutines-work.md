@@ -409,7 +409,7 @@ In practice functions like `coro_suspend_and_yield_to_other` are called from hyp
 
 To give you an idea how that works with non-blocking IO, using event loop and stackless coroutines in Python, take a look at this post - [How Python coroutines work](/2025/01/25/AC-part7-how-to-write-your-own-event-loop-for-python-async-funcs.html).
 
-To give you an idea how OS handles blocking IO with threads take a look at this post - [Layers of abstraction](/2025/01/12/AC-part2-layers-of-abstraction.html).
+To give you an idea how OS handles blocking IO with threads take a look at this post - [Layers of Abstraction](/2025/01/12/AC-part2-layers-of-abstraction.html).
 
 In reality, coroutines in high performance environments are ran by multiple threads, each thread executes single coroutine at a time, but as multiple threads run simultaneously, multiple coroutines can run in parallel. When one thread has no more coroutines to run (all of them might be suspended waiting for IO operation or sleeping), that thread can try and take task/coroutine from task queue that belongs to another thread (work stealing).
 

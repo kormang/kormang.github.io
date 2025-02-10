@@ -323,6 +323,6 @@ It is not too broad topic, but still there is a lot to talk about when it comes 
 
 There is also great [talk](https://www.youtube.com/watch?v=Mj5P47F6nJg) about structured concurrency by Roman Elizarov, whose team invented structured concurrency independently (the concept, not the term) while implementing coroutines for Kotlin language. There, basic motivation for structured concurrency is well explained, which is error handling and cancellation.
 
-These two resources, especially combined, do a great job at explaining structured concurrency.
+These two resources, especially combined, do a great job at explaining structured concurrency, much better then I could do.
 
 Python and Kotlin are first two languages to adopt structured concurrency. Other languages have also started adopting structured concurrency, Swift (since 2021), Java (part of Project Loom, in Java 21), end there are some proposals to add it to Go too.
